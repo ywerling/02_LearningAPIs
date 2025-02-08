@@ -9,8 +9,12 @@ import (
 )
 
 type ApiResponse struct {
-	Sunrise string `json:"sunrise"`
-	Sunset  string `json:"sunset"`
+	Results struct {
+		Sunrise string `json:"sunrise"`
+		Sunset  string `json:"sunset"`
+	} `json:"results"`
+	Status string `json:"status"`
+	TZID   string `json:"tzid"`
 }
 
 func main() {
@@ -55,27 +59,15 @@ func main() {
 	fmt.Println("Full Response (Raw Data):", string(body))
 
 	// Parse JSON into the struct with Unmarshall
-	// var data ApiResponse
-	// err = json.Unmarshal(body, &data)
-	// if err != nil {
-	// fmt.Println("Error parsing JSON:", err)
-	// return
-	// }
-	//
-	// Print relevant parameters response
-	// fmt.Println("Sunrise (UTC):", data.Sunrise)
-	// fmt.Println("Sunset (UTC):", data.Sunset)
-
-	// Use json.Decoder to decode the JSON response
 	var data ApiResponse
-	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&data)
+	err = json.Unmarshal(body, &data)
 	if err != nil {
-		fmt.Println("Error decoding JSON:", err)
+		fmt.Println("Error parsing JSON:", err)
 		return
 	}
-
-	// Print parsed response
-	fmt.Println("Sunrise (UTC):", data.Sunrise)
+	//
+	// Print relevant parameters response
+	fmt.Println("Sunrise (UTC):", data.Results.Sunrise)
+	fmt.Println("Sunset (UTC):", data.Results.Sunset)
 
 }
