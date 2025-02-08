@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -18,6 +19,23 @@ type ApiResponse struct {
 }
 
 func main() {
+
+	// Read latitude and longitude from the command line
+	fmt.Println("Enter the latitude and longitude:")
+	fmt.Println("Example Bratislava 48.14816 17.10674:")
+	fmt.Println("Example Vienna: 48.210033 16.363449")
+	fmt.Println("Enter values:\n")
+	var lat, lng string
+	n, err := fmt.Scanln(&lat, &lng)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("number of items read: %d\n", n)
+	fmt.Printf("read line: %s %s\n", lat, lng)
+
+	// Prepare http connection
+
 	client := &http.Client{}
 
 	// Define Sunrise Sunset URL
@@ -26,8 +44,10 @@ func main() {
 	// Create URL with query parameters latitude and longitude
 	// for Vienna 48.210033 16.363449
 	params := url.Values{}
-	params.Add("lat", "48.210033")
-	params.Add("lng", "16.363449")
+	// params.Add("lat", "48.210033")
+	// params.Add("lng", "16.363449")
+	params.Add("lat", lat)
+	params.Add("lng", lng)
 	fullURL := fmt.Sprintf("%s?%s", suntimesURL, params.Encode())
 
 	// Create a GET request
@@ -67,7 +87,11 @@ func main() {
 	}
 	//
 	// Print relevant parameters response
-	fmt.Println("Sunrise (UTC):", data.Results.Sunrise)
-	fmt.Println("Sunset (UTC):", data.Results.Sunset)
+	if data.Status == "OK" {
+		fmt.Println("Sunrise:", data.Results.Sunrise, data.TZID)
+		fmt.Println("Sunset:", data.Results.Sunset, data.TZID)
+	} else {
+		fmt.Println("Times of sunrise and sunset not available!")
+	}
 
 }
