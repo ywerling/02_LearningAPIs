@@ -11,13 +11,45 @@ import (
 
 // ApiResponse represents the expected JSON response structure
 type ApiResponse struct {
-	tempVar string
-	// Results struct {
-	// Sunrise string `json:"sunrise"`
-	// Sunset  string `json:"sunset"`
-	// } `json:"results"`
-	// Status string `json:"status"`
-	// TZID   string `json:"tzid"`
+	Product    string       `json:"product"`
+	Init       string       `json:"init"`
+	DataSeries []DataSeries `json:"dataseries"`
+}
+
+// Example of datapoint
+// {
+// "timepoint" : 72,
+// "cloudcover" : 9,
+// "seeing" : 3,
+// "transparency" : 4,
+// "lifted_index" : 2,
+// "rh2m" : 11,
+// "wind10m" : {
+// "direction" : "SE",
+// "speed" : 2
+// },
+// "temp2m" : 9,
+// "prec_type" : "none"
+// }
+//
+
+// DataSeries represents each entry in the dataseries array of weather forecasts
+type DataSeries struct {
+	Timepoint    int     `json:"timepoint"`
+	CloudCover   int     `json:"cloudcover"`
+	Seeing       int     `json:"seeing"`
+	Transparency int     `json:"transparency"`
+	LiftedIndex  int     `json:"lifted_index"`
+	RH2m         int     `json:"rh2m"`
+	Wind10m      Wind10m `json:"wind10m"`
+	Temp2m       int     `json:"temp2m"`
+	PrecType     string  `json:"prec_type"`
+}
+
+// Wind10m represents the wind information at 10 meters above ground.
+type Wind10m struct {
+	Direction string `json:"direction"`
+	Speed     int    `json:"speed"`
 }
 
 // readUserInput prompts the user for latitude and longitude
@@ -67,6 +99,7 @@ func fetchWeatherData(apiURL string) (*ApiResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("reading response: %w", err)
 	}
+	fmt.Println("Full Response (Raw Data):", string(body))
 
 	// Parse JSON response
 	var data ApiResponse
@@ -80,6 +113,11 @@ func fetchWeatherData(apiURL string) (*ApiResponse, error) {
 
 func printWeatherData(data *ApiResponse) {
 	fmt.Println("Printing Weather Forecast for Location:")
+	fmt.Println("Init:", data.Init)
+	fmt.Println("Product:", data.Product)
+	fmt.Println("Timepoint", data.DataSeries[0].Timepoint)
+	fmt.Println("Cloudcover", data.DataSeries[0].CloudCover)
+
 }
 
 func main() {
