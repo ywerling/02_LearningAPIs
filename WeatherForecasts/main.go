@@ -160,6 +160,44 @@ func getCloudCover(cloudCover int) string {
 	return "undefined"
 }
 
+func getSeeing(seeing int) string {
+	seeingMap := []string{
+		"undefined", // Index 0, not used
+		"<0.5",      // Index 1
+		"0.5-0.75",  // Index 2
+		"0.75-1",    // Index 3
+		"1-1.25",    // Index 4
+		"1.25-1.5",  // Index 5
+		"1.5-2",     // Index 6
+		"2-2.5",     // Index 7
+		">2.5",      // Index 8
+	}
+
+	if seeing >= 1 && seeing <= 8 {
+		return seeingMap[seeing]
+	}
+	return "undefined"
+}
+
+func getTransparency(transparency int) string {
+	transparencyMap := []string{
+		"undefined", // Index 0, not used
+		"<0.3",      // Index 1
+		"0.3-0.4",   // Index 2
+		"0.4-0.5",   // Index 3
+		"0.5-0.6",   // Index 4
+		"0.6-0.7",   // Index 5
+		"0.7-0.85",  // Index 6
+		"0.85-1",    // Index 7
+		">1",        // Index 8
+	}
+
+	if transparency >= 1 && transparency <= 8 {
+		return transparencyMap[transparency]
+	}
+	return "undefined"
+}
+
 func getLiftedIndex(liftedIndex int) string {
 	switch liftedIndex {
 	case -10:
@@ -261,6 +299,8 @@ func printWeatherData(data *ApiResponse) {
 	fmt.Println("Cloud cover", getCloudCover(data.DataSeries[0].CloudCover))
 	fmt.Println("Lifted Index", getLiftedIndex(data.DataSeries[0].LiftedIndex))
 	fmt.Println("Temperature 2 meters", data.DataSeries[0].Temp2m, "°C")
+	fmt.Println("Seeing range", getSeeing(data.DataSeries[0].Seeing))
+	fmt.Println("Transparency range", getTransparency(data.DataSeries[0].Transparency))
 	fmt.Println("Relative humidity 2 meters", getRelativeHumidity(data.DataSeries[0].RH2m))
 	fmt.Println("Precipitation type", data.DataSeries[0].PrecType)
 	fmt.Println("Wind", data.DataSeries[0].Wind10m.Direction, getWindSpeed(data.DataSeries[0].Wind10m.Speed))
