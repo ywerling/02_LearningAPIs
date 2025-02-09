@@ -111,12 +111,40 @@ func fetchWeatherData(apiURL string) (*ApiResponse, error) {
 
 }
 
+func getCloudCover(cloudCover int) string {
+
+	switch cloudCover {
+	case 1:
+		return "0-6 %"
+	case 2:
+		return "6-19 %"
+	case 3:
+		return "19-31 %"
+	case 4:
+		return "31-44 %"
+	case 5:
+		return "44-56 %"
+	case 6:
+		return "56-69 %"
+	case 7:
+		return "69-81 %"
+	case 8:
+		return "81-94 %"
+	case 9:
+		return "94-100 %"
+	default:
+		return "undefined"
+
+	}
+	return "N/A"
+}
+
 func printWeatherData(data *ApiResponse) {
 	fmt.Println("Printing Weather Forecast for Location:")
-	fmt.Println("Init:", data.Init)
+	fmt.Println("Initial timestamp:", data.Init)
 	fmt.Println("Product:", data.Product)
-	fmt.Println("Timepoint", data.DataSeries[0].Timepoint)
-	fmt.Println("Cloudcover", data.DataSeries[0].CloudCover)
+	fmt.Println("Timepoint", data.DataSeries[0].Timepoint, "hours")
+	fmt.Println("Cloud cover", getCloudCover(data.DataSeries[0].CloudCover))
 
 }
 
