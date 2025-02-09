@@ -136,7 +136,105 @@ func getCloudCover(cloudCover int) string {
 		return "undefined"
 
 	}
-	return "N/A"
+
+}
+
+func getLiftedIndex(liftedIndex int) string {
+	switch liftedIndex {
+	case -10:
+		return "below -7"
+	case -6:
+		return "-7 to -5"
+	case -4:
+		return "-5 to -3"
+	case -1:
+		return "-3 to 0"
+	case 2:
+		return "0 to 4"
+	case 6:
+		return "4 to 8"
+	case 10:
+		return "8 to 11"
+	case 15:
+		return "over 11"
+	default:
+		return "undefined"
+
+	}
+}
+
+func GetWindSpeed(windSpeed int) string {
+	switch windSpeed {
+	case 1:
+		return "Below 0.3m/s (calm)"
+	case 2:
+		return "0.3-3.4m/s (light)"
+	case 3:
+		return "3.4-8.0m/s (moderate)"
+	case 4:
+		return "8.0-10.8m/s (fresh)"
+	case 5:
+		return "10.8-17.2m/s (strong)"
+	case 6:
+		return "17.2-24.5m/s (gale)"
+	case 7:
+		return "24.5-32.6m/s (storm)"
+	case 8:
+		return "Over 32.6m/s (hurricane)"
+	default:
+		return "undefined"
+
+	}
+}
+
+func getRelativeHumidity(relHum int) string {
+	switch relHum {
+	case -4:
+		return "0-5 %"
+	case -3:
+		return "5-10 %"
+	case -2:
+		return "10-15 %"
+	case -1:
+		return "15-20 %"
+	case 0:
+		return "20-25 %"
+	case 1:
+		return "25-30 %"
+	case 2:
+		return "30-35 %"
+	case 3:
+		return "35-40 %"
+	case 4:
+		return "40-45 %"
+	case 5:
+		return "45-50 %"
+	case 6:
+		return "50-55 %"
+	case 7:
+		return "55-60 %"
+	case 8:
+		return "60-65 %"
+	case 9:
+		return "65-70 %"
+	case 10:
+		return "70-75 %"
+	case 11:
+		return "75-80 %"
+	case 12:
+		return "80-85 %"
+	case 13:
+		return "85-90 %"
+	case 14:
+		return "90-95 %"
+	case 15:
+		return "95-99 %"
+	case 16:
+		return "100 %"
+	default:
+		return "undefined"
+
+	}
 }
 
 func printWeatherData(data *ApiResponse) {
@@ -145,6 +243,11 @@ func printWeatherData(data *ApiResponse) {
 	fmt.Println("Product:", data.Product)
 	fmt.Println("Timepoint", data.DataSeries[0].Timepoint, "hours")
 	fmt.Println("Cloud cover", getCloudCover(data.DataSeries[0].CloudCover))
+	fmt.Println("Lifted Index", getLiftedIndex(data.DataSeries[0].LiftedIndex))
+	fmt.Println("Temperature 2 meters", data.DataSeries[0].Temp2m, "°C")
+	fmt.Println("Relative humidity 2 meters", getRelativeHumidity(data.DataSeries[0].RH2m))
+	fmt.Println("Precipitation type", data.DataSeries[0].PrecType)
+	fmt.Println("Wind", data.DataSeries[0].Wind10m.Direction, GetWindSpeed(data.DataSeries[0].Wind10m.Speed))
 
 }
 
