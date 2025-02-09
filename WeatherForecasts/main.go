@@ -111,32 +111,53 @@ func fetchWeatherData(apiURL string) (*ApiResponse, error) {
 
 }
 
+// func getCloudCover(cloudCover int) string {
+//
+// switch cloudCover {
+// case 1:
+// return "0-6 %"
+// case 2:
+// return "6-19 %"
+// case 3:
+// return "19-31 %"
+// case 4:
+// return "31-44 %"
+// case 5:
+// return "44-56 %"
+// case 6:
+// return "56-69 %"
+// case 7:
+// return "69-81 %"
+// case 8:
+// return "81-94 %"
+// case 9:
+// return "94-100 %"
+// default:
+// return "undefined"
+//
+// }
+//
+// }
+//
+
 func getCloudCover(cloudCover int) string {
-
-	switch cloudCover {
-	case 1:
-		return "0-6 %"
-	case 2:
-		return "6-19 %"
-	case 3:
-		return "19-31 %"
-	case 4:
-		return "31-44 %"
-	case 5:
-		return "44-56 %"
-	case 6:
-		return "56-69 %"
-	case 7:
-		return "69-81 %"
-	case 8:
-		return "81-94 %"
-	case 9:
-		return "94-100 %"
-	default:
-		return "undefined"
-
+	cloudCoverMap := []string{
+		"undefined", // Index 0 (not used, as valid values start from 1)
+		"0-6 %",     // Index 1
+		"6-19 %",    // Index 2
+		"19-31 %",   // Index 3
+		"31-44 %",   // Index 4
+		"44-56 %",   // Index 5
+		"56-69 %",   // Index 6
+		"69-81 %",   // Index 7
+		"81-94 %",   // Index 8
+		"94-100 %",  // Index 9
 	}
 
+	if cloudCover >= 1 && cloudCover <= 9 {
+		return cloudCoverMap[cloudCover]
+	}
+	return "undefined"
 }
 
 func getLiftedIndex(liftedIndex int) string {
@@ -163,28 +184,23 @@ func getLiftedIndex(liftedIndex int) string {
 	}
 }
 
-func GetWindSpeed(windSpeed int) string {
-	switch windSpeed {
-	case 1:
-		return "Below 0.3m/s (calm)"
-	case 2:
-		return "0.3-3.4m/s (light)"
-	case 3:
-		return "3.4-8.0m/s (moderate)"
-	case 4:
-		return "8.0-10.8m/s (fresh)"
-	case 5:
-		return "10.8-17.2m/s (strong)"
-	case 6:
-		return "17.2-24.5m/s (gale)"
-	case 7:
-		return "24.5-32.6m/s (storm)"
-	case 8:
-		return "Over 32.6m/s (hurricane)"
-	default:
-		return "undefined"
-
+func getWindSpeed(windSpeed int) string {
+	windSpeedMap := []string{
+		"undefined",                // Index 0 (not used, as valid values start from 1)
+		"Below 0.3m/s (calm)",      // Index 1
+		"0.3-3.4m/s (light)",       // Index 2
+		"3.4-8.0m/s (moderate)",    // Index 3
+		"8.0-10.8m/s (fresh)",      // Index 4
+		"10.8-17.2m/s (strong)",    // Index 5
+		"17.2-24.5m/s (gale)",      // Index 6
+		"24.5-32.6m/s (storm)",     // Index 7
+		"Over 32.6m/s (hurricane)", // Index 8
 	}
+
+	if windSpeed >= 1 && windSpeed <= 8 {
+		return windSpeedMap[windSpeed]
+	}
+	return "undefined"
 }
 
 func getRelativeHumidity(relHum int) string {
@@ -247,7 +263,7 @@ func printWeatherData(data *ApiResponse) {
 	fmt.Println("Temperature 2 meters", data.DataSeries[0].Temp2m, "°C")
 	fmt.Println("Relative humidity 2 meters", getRelativeHumidity(data.DataSeries[0].RH2m))
 	fmt.Println("Precipitation type", data.DataSeries[0].PrecType)
-	fmt.Println("Wind", data.DataSeries[0].Wind10m.Direction, GetWindSpeed(data.DataSeries[0].Wind10m.Speed))
+	fmt.Println("Wind", data.DataSeries[0].Wind10m.Direction, getWindSpeed(data.DataSeries[0].Wind10m.Speed))
 
 }
 
