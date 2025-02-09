@@ -1,0 +1,1 @@
+This application requests the user to enter the latitude and longitude of a place and fetches weather forecast by API
