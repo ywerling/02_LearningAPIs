@@ -111,34 +111,13 @@ func fetchWeatherData(apiURL string) (*ApiResponse, error) {
 
 }
 
-// func getCloudCover(cloudCover int) string {
-//
-// switch cloudCover {
-// case 1:
-// return "0-6 %"
-// case 2:
-// return "6-19 %"
-// case 3:
-// return "19-31 %"
-// case 4:
-// return "31-44 %"
-// case 5:
-// return "44-56 %"
-// case 6:
-// return "56-69 %"
-// case 7:
-// return "69-81 %"
-// case 8:
-// return "81-94 %"
-// case 9:
-// return "94-100 %"
-// default:
-// return "undefined"
-//
-// }
-//
-// }
-//
+// getMappedValue returns the mapped value for a given key using a provided map
+func getMappedValue(key int, valueMap []string) string {
+	if key >= 0 && key < len(valueMap) {
+		return valueMap[key]
+	}
+	return "undefined"
+}
 
 func getCloudCover(cloudCover int) string {
 	cloudCoverMap := []string{
@@ -154,10 +133,12 @@ func getCloudCover(cloudCover int) string {
 		"94-100 %",  // Index 9
 	}
 
-	if cloudCover >= 1 && cloudCover <= 9 {
-		return cloudCoverMap[cloudCover]
-	}
-	return "undefined"
+	return getMappedValue(cloudCover, cloudCoverMap)
+
+	// if cloudCover >= 1 && cloudCover <= 9 {
+	// return cloudCoverMap[cloudCover]
+	// }
+	// return "undefined"
 }
 
 func getSeeing(seeing int) string {
@@ -173,10 +154,12 @@ func getSeeing(seeing int) string {
 		">2.5",      // Index 8
 	}
 
-	if seeing >= 1 && seeing <= 8 {
-		return seeingMap[seeing]
-	}
-	return "undefined"
+	return getMappedValue(seeing, seeingMap)
+
+	// if seeing >= 1 && seeing <= 8 {
+	// return seeingMap[seeing]
+	// }
+	// return "undefined"
 }
 
 func getTransparency(transparency int) string {
@@ -192,34 +175,50 @@ func getTransparency(transparency int) string {
 		">1",        // Index 8
 	}
 
-	if transparency >= 1 && transparency <= 8 {
-		return transparencyMap[transparency]
-	}
-	return "undefined"
+	return getMappedValue(transparency, transparencyMap)
+
+	// if transparency >= 1 && transparency <= 8 {
+	// return transparencyMap[transparency]
+	// }
+	// return "undefined"
 }
 
 func getLiftedIndex(liftedIndex int) string {
-	switch liftedIndex {
-	case -10:
-		return "below -7"
-	case -6:
-		return "-7 to -5"
-	case -4:
-		return "-5 to -3"
-	case -1:
-		return "-3 to 0"
-	case 2:
-		return "0 to 4"
-	case 6:
-		return "4 to 8"
-	case 10:
-		return "8 to 11"
-	case 15:
-		return "over 11"
-	default:
-		return "undefined"
-
+	// switch liftedIndex {
+	// case -10:
+	// return "below -7"
+	// case -6:
+	// return "-7 to -5"
+	// case -4:
+	// return "-5 to -3"
+	// case -1:
+	// return "-3 to 0"
+	// case 2:
+	// return "0 to 4"
+	// case 6:
+	// return "4 to 8"
+	// case 10:
+	// return "8 to 11"
+	// case 15:
+	// return "over 11"
+	// default:
+	// return "undefined"
+	//
+	// }
+	liftedIndexMap := map[int]string{
+		-10: "below -7",
+		-6:  "-7 to -5",
+		-4:  "-5 to -3",
+		-1:  "-3 to 0",
+		2:   "0 to 4",
+		6:   "4 to 8",
+		10:  "8 to 11",
+		15:  "over 11",
 	}
+	if val, ok := liftedIndexMap[liftedIndex]; ok {
+		return val
+	}
+	return "undefined"
 }
 
 func getWindSpeed(windSpeed int) string {
@@ -235,60 +234,90 @@ func getWindSpeed(windSpeed int) string {
 		"Over 32.6m/s (hurricane)", // Index 8
 	}
 
-	if windSpeed >= 1 && windSpeed <= 8 {
-		return windSpeedMap[windSpeed]
-	}
-	return "undefined"
+	return getMappedValue(windSpeed, windSpeedMap)
+
+	// if windSpeed >= 1 && windSpeed <= 8 {
+	// return windSpeedMap[windSpeed]
+	// }
+	// return "undefined"
 }
 
 func getRelativeHumidity(relHum int) string {
-	switch relHum {
-	case -4:
-		return "0-5 %"
-	case -3:
-		return "5-10 %"
-	case -2:
-		return "10-15 %"
-	case -1:
-		return "15-20 %"
-	case 0:
-		return "20-25 %"
-	case 1:
-		return "25-30 %"
-	case 2:
-		return "30-35 %"
-	case 3:
-		return "35-40 %"
-	case 4:
-		return "40-45 %"
-	case 5:
-		return "45-50 %"
-	case 6:
-		return "50-55 %"
-	case 7:
-		return "55-60 %"
-	case 8:
-		return "60-65 %"
-	case 9:
-		return "65-70 %"
-	case 10:
-		return "70-75 %"
-	case 11:
-		return "75-80 %"
-	case 12:
-		return "80-85 %"
-	case 13:
-		return "85-90 %"
-	case 14:
-		return "90-95 %"
-	case 15:
-		return "95-99 %"
-	case 16:
-		return "100 %"
-	default:
-		return "undefined"
-
+	// switch relHum {
+	// case -4:
+	// return "0-5 %"
+	// case -3:
+	// return "5-10 %"
+	// case -2:
+	// return "10-15 %"
+	// case -1:
+	// return "15-20 %"
+	// case 0:
+	// return "20-25 %"
+	// case 1:
+	// return "25-30 %"
+	// case 2:
+	// return "30-35 %"
+	// case 3:
+	// return "35-40 %"
+	// case 4:
+	// return "40-45 %"
+	// case 5:
+	// return "45-50 %"
+	// case 6:
+	// return "50-55 %"
+	// case 7:
+	// return "55-60 %"
+	// case 8:
+	// return "60-65 %"
+	// case 9:
+	// return "65-70 %"
+	// case 10:
+	// return "70-75 %"
+	// case 11:
+	// return "75-80 %"
+	// case 12:
+	// return "80-85 %"
+	// case 13:
+	// return "85-90 %"
+	// case 14:
+	// return "90-95 %"
+	// case 15:
+	// return "95-99 %"
+	// case 16:
+	// return "100 %"
+	// default:
+	// return "undefined"
+	//
+	// }
+	relativeHumidityMap := map[int]string{
+		-4: "0-5 %",
+		-3: "5-10 %",
+		-2: "10-15 %",
+		-1: "15-20 %",
+		0:  "20-25 %",
+		1:  "25-30 %",
+		2:  "30-35 %",
+		3:  "35-40 %",
+		4:  "40-45 %",
+		5:  "45-50 %",
+		6:  "50-55 %",
+		7:  "55-60 %",
+		8:  "60-65 %",
+		9:  "65-70 %",
+		10: "70-75 %",
+		11: "75-80 %",
+		12: "80-85 %",
+		13: "85-90 %",
+		14: "90-95 %",
+		15: "95-99 %",
+		16: "100 %",
 	}
+	if val, ok := relativeHumidityMap[relHum]; ok {
+		return val
+	}
+	return "undefined"
+
 }
 
 func printWeatherData(data *ApiResponse) {
