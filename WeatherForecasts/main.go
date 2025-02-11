@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 // ApiResponse represents the expected JSON response structure
@@ -336,6 +338,26 @@ func printWeatherData(data *ApiResponse) {
 
 }
 
+func printWeatherDataToCSV(data *ApiResponse) {
+	// create a file
+	file, err := os.Create("forecasts.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	// initialize csv writer
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// write all rows at once
+	// writer.WriteAll(data.DataSeries)
+
+	rowData := []string{string(data.DataSeries[0].Timepoint), getCloudCover(data.DataSeries[0].CloudCover)}
+	writer.Write(rowData)
+
+}
+
 func main() {
 	lat, lng := readUserInput()
 	apiURL := buildAPIURL(lat, lng)
@@ -345,4 +367,6 @@ func main() {
 	}
 
 	printWeatherData(data)
+
+	printWeatherDataToCSV(data)
 }
