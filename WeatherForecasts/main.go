@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 )
 
 // ApiResponse represents the expected JSON response structure
@@ -338,7 +339,7 @@ func printWeatherData(data *ApiResponse) {
 
 }
 
-func printWeatherDataToCSV(data *ApiResponse) {
+func printWeatherDataToCSV(data *ApiResponse, lat string, lng string) {
 	// create a file
 	file, err := os.Create("forecasts.csv")
 	if err != nil {
@@ -353,8 +354,23 @@ func printWeatherDataToCSV(data *ApiResponse) {
 	// write all rows at once
 	// writer.WriteAll(data.DataSeries)
 
-	rowData := []string{string(data.DataSeries[0].Timepoint), getCloudCover(data.DataSeries[0].CloudCover)}
-	writer.Write(rowData)
+	// write header
+	rowData1 := []string{"Weather forecasts data for"}
+	writer.Write(rowData1)
+	rowData2 := []string{"latitude", lat}
+	writer.Write(rowData2)
+	rowData3 := []string{"longitude", lng}
+	writer.Write(rowData3)
+	rowData4 := []string{"Initial timestamp", data.Init}
+	writer.Write(rowData4)
+	rowData5 := []string{"Product", data.Product}
+	writer.Write(rowData5)
+
+	// write forecast series to file
+	for i := 0; i < len(data.DataSeries); i++ {
+		rowData := []string{strconv.Itoa(data.DataSeries[i].Timepoint), getCloudCover(data.DataSeries[i].CloudCover)}
+		writer.Write(rowData)
+	}
 
 }
 
@@ -368,5 +384,5 @@ func main() {
 
 	printWeatherData(data)
 
-	printWeatherDataToCSV(data)
+	printWeatherDataToCSV(data, lat, lng)
 }
