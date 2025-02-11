@@ -223,24 +223,38 @@ func getRelativeHumidity(relHum int) string {
 }
 
 func printWeatherData(data *ApiResponse) {
-	fmt.Println("Printing Weather Forecast for Location:")
-	fmt.Println("Initial timestamp:", data.Init)
-	fmt.Println("Product:", data.Product)
-	fmt.Println("Timepoint", data.DataSeries[0].Timepoint, "hours")
-	// fmt.Println("Cloud cover", getCloudCover(data.DataSeries[0].CloudCover))
-	fmt.Println("Cloud Cover:", data.DataSeries[0].CloudCoverString())
-	// fmt.Println("Lifted Index", getLiftedIndex(data.DataSeries[0].LiftedIndex))
-	fmt.Println("Lifted Index", data.DataSeries[0].LiftedIndexString())
-	// fmt.Println("Temperature 2 meters", data.DataSeries[0].Temp2m, "°C")
-	fmt.Println("Temperature 2 meters", data.DataSeries[0].TemperatureString())
-	// fmt.Println("Seeing range", getSeeing(data.DataSeries[0].Seeing))
-	fmt.Println("Seeing range:", data.DataSeries[0].SeeingString())
-	// fmt.Println("Transparency range", getTransparency(data.DataSeries[0].Transparency))
-	fmt.Println("Transparency range:", data.DataSeries[0].TransparencyString())
-	// fmt.Println("Relative humidity 2 meters", getRelativeHumidity(data.DataSeries[0].RH2m))
-	fmt.Println("Relative humidity 2 meters", data.DataSeries[0].HumidityString())
-	fmt.Println("Precipitation type", data.DataSeries[0].PrecType)
-	fmt.Println("Wind", data.DataSeries[0].WindSpeedString())
+	// fmt.Println("Printing Weather Forecast for Location:")
+	// fmt.Println("Initial timestamp:", data.Init)
+	// fmt.Println("Product:", data.Product)
+	// fmt.Println("Timepoint", data.DataSeries[0].Timepoint, "hours")
+	// fmt.Println("Cloud Cover:", data.DataSeries[0].CloudCoverString())
+	// fmt.Println("Lifted Index", data.DataSeries[0].LiftedIndexString())
+	// fmt.Println("Temperature 2 meters", data.DataSeries[0].TemperatureString())
+	// fmt.Println("Seeing range:", data.DataSeries[0].SeeingString())
+	// fmt.Println("Transparency range:", data.DataSeries[0].TransparencyString())
+	// fmt.Println("Relative humidity 2 meters", data.DataSeries[0].HumidityString())
+	// fmt.Println("Precipitation type", data.DataSeries[0].PrecType)
+	// fmt.Println("Wind", data.DataSeries[0].WindSpeedString())
+
+	ds := data.DataSeries[0]
+	fmt.Printf(`Weather Forecast:
+	---------------------------
+	Location Timestamp: %s
+	Product: %s
+	Timepoint: %d hours
+	Cloud Cover: %s
+	Lifted Index: %s
+	Temperature: %s
+	Seeing Range: %s
+	Transparency: %s
+	Relative Humidity: %s
+	Precipitation Type: %s
+	Wind: %s 
+	---------------------------
+	`, data.Init, data.Product, ds.Timepoint, ds.CloudCoverString(),
+		ds.LiftedIndexString(), ds.TemperatureString(), ds.SeeingString(),
+		ds.TransparencyString(), ds.HumidityString(),
+		ds.PrecType, ds.WindSpeedString())
 
 }
 
@@ -268,10 +282,13 @@ func printWeatherDataToCSV(data *ApiResponse, lat string, lng string) {
 	rowData5 := []string{"Product", data.Product}
 	writer.Write(rowData5)
 
+	rowData6 := []string{"Timepoint", "Temperature 2m", "Cloud Cover", "Lifted Index", "Seeing", "Transparency", "Humidity", "Precipitation", "Wind 10m"}
+	writer.Write(rowData6)
+
 	// write forecast series to file
 	for i := 0; i < len(data.DataSeries); i++ {
 		// rowData := []string{strconv.Itoa(data.DataSeries[i].Timepoint), getCloudCover(data.DataSeries[i].CloudCover)}
-		rowData := []string{strconv.Itoa(data.DataSeries[i].Timepoint), data.DataSeries[i].CloudCoverString(), data.DataSeries[i].LiftedIndexString(), data.DataSeries[i].TemperatureString(), data.DataSeries[i].SeeingString(), data.DataSeries[i].TransparencyString(), data.DataSeries[i].HumidityString(), data.DataSeries[i].PrecType, data.DataSeries[i].WindSpeedString()}
+		rowData := []string{strconv.Itoa(data.DataSeries[i].Timepoint), data.DataSeries[i].TemperatureString(), data.DataSeries[i].CloudCoverString(), data.DataSeries[i].LiftedIndexString(), data.DataSeries[i].SeeingString(), data.DataSeries[i].TransparencyString(), data.DataSeries[i].HumidityString(), data.DataSeries[i].PrecType, data.DataSeries[i].WindSpeedString()}
 		writer.Write(rowData)
 	}
 
