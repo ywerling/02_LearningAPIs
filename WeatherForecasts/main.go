@@ -49,6 +49,34 @@ type DataSeries struct {
 	PrecType     string  `json:"prec_type"`
 }
 
+func (ds DataSeries) CloudCoverString() string {
+	return getCloudCover(ds.CloudCover)
+}
+
+func (ds DataSeries) SeeingString() string {
+	return getSeeing(ds.Seeing)
+}
+
+func (ds DataSeries) TransparencyString() string {
+	return getTransparency(ds.Transparency)
+}
+
+func (ds DataSeries) LiftedIndexString() string {
+	return getLiftedIndex(ds.LiftedIndex)
+}
+
+func (ds DataSeries) WindSpeedString() string {
+	return ds.Wind10m.Direction + " " + getWindSpeed(ds.Wind10m.Speed)
+}
+
+func (ds DataSeries) HumidityString() string {
+	return getRelativeHumidity(ds.RH2m)
+}
+
+func (ds DataSeries) TemperatureString() string {
+	return strconv.Itoa(ds.Temp2m) + " C"
+}
+
 // Wind10m represents the wind information at 10 meters above ground.
 type Wind10m struct {
 	Direction string `json:"direction"`
@@ -97,12 +125,17 @@ func fetchWeatherData(apiURL string) (*ApiResponse, error) {
 	}
 	defer response.Body.Close()
 
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
+	}
+
 	// Read response body
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("reading response: %w", err)
 	}
-	fmt.Println("Full Response (Raw Data):", string(body))
+	// Print the entire raw json response, uncomment when debugging
+	// fmt.Println("Full Response (Raw Data):", string(body))
 
 	// Parse JSON response
 	var data ApiResponse
@@ -130,23 +163,6 @@ func getCloudCover(cloudCover int) string {
 	return getMappedValue(cloudCover, cloudCoverMap)
 }
 
-// func getCloudCover(cloudCover int) string {
-// cloudCoverMap := []string{
-// "undefined", // Index 0 (not used, as valid values start from 1)
-// "0-6 %",     // Index 1
-// "6-19 %",    // Index 2
-// "19-31 %",   // Index 3
-// "31-44 %",   // Index 4
-// "44-56 %",   // Index 5
-// "56-69 %",   // Index 6
-// "69-81 %",   // Index 7
-// "81-94 %",   // Index 8
-// "94-100 %",  // Index 9
-// }
-//
-// return getMappedValue(cloudCover, cloudCoverMap)
-// }
-
 var seeingMap = []string{
 	"undefined", "<0.5", "0.5-0.75", "0.75-1", "1-1.25", "1.25-1.5", "1.5-2", "2-2.5", ">2.5",
 }
@@ -161,18 +177,6 @@ var transparencyMap = []string{
 }
 
 func getTransparency(transparency int) string {
-	// transparencyMap := []string{
-	// "undefined", // Index 0, not used
-	// "<0.3",      // Index 1
-	// "0.3-0.4",   // Index 2
-	// "0.4-0.5",   // Index 3
-	// "0.5-0.6",   // Index 4
-	// "0.6-0.7",   // Index 5
-	// "0.7-0.85",  // Index 6
-	// "0.85-1",    // Index 7
-	// ">1",        // Index 8
-	// }
-
 	return getMappedValue(transparency, transparencyMap)
 }
 
@@ -198,18 +202,6 @@ var windSpeedMap = []string{
 }
 
 func getWindSpeed(windSpeed int) string {
-	// windSpeedMap := []string{
-	// "undefined",                // Index 0 (not used, as valid values start from 1)
-	// "Below 0.3m/s (calm)",      // Index 1
-	// "0.3-3.4m/s (light)",       // Index 2
-	// "3.4-8.0m/s (moderate)",    // Index 3
-	// "8.0-10.8m/s (fresh)",      // Index 4
-	// "10.8-17.2m/s (strong)",    // Index 5
-	// "17.2-24.5m/s (gale)",      // Index 6
-	// "24.5-32.6m/s (storm)",     // Index 7
-	// "Over 32.6m/s (hurricane)", // Index 8
-	// }
-	//
 	return getMappedValue(windSpeed, windSpeedMap)
 }
 
@@ -223,29 +215,6 @@ var relativeHumidityMap = map[int]string{
 }
 
 func getRelativeHumidity(relHum int) string {
-	// relativeHumidityMap := map[int]string{
-	// -4: "0-5 %",
-	// -3: "5-10 %",
-	// -2: "10-15 %",
-	// -1: "15-20 %",
-	// 0:  "20-25 %",
-	// 1:  "25-30 %",
-	// 2:  "30-35 %",
-	// 3:  "35-40 %",
-	// 4:  "40-45 %",
-	// 5:  "45-50 %",
-	// 6:  "50-55 %",
-	// 7:  "55-60 %",
-	// 8:  "60-65 %",
-	// 9:  "65-70 %",
-	// 10: "70-75 %",
-	// 11: "75-80 %",
-	// 12: "80-85 %",
-	// 13: "85-90 %",
-	// 14: "90-95 %",
-	// 15: "95-99 %",
-	// 16: "100 %",
-	// }
 	if val, ok := relativeHumidityMap[relHum]; ok {
 		return val
 	}
@@ -258,14 +227,20 @@ func printWeatherData(data *ApiResponse) {
 	fmt.Println("Initial timestamp:", data.Init)
 	fmt.Println("Product:", data.Product)
 	fmt.Println("Timepoint", data.DataSeries[0].Timepoint, "hours")
-	fmt.Println("Cloud cover", getCloudCover(data.DataSeries[0].CloudCover))
-	fmt.Println("Lifted Index", getLiftedIndex(data.DataSeries[0].LiftedIndex))
-	fmt.Println("Temperature 2 meters", data.DataSeries[0].Temp2m, "°C")
-	fmt.Println("Seeing range", getSeeing(data.DataSeries[0].Seeing))
-	fmt.Println("Transparency range", getTransparency(data.DataSeries[0].Transparency))
-	fmt.Println("Relative humidity 2 meters", getRelativeHumidity(data.DataSeries[0].RH2m))
+	// fmt.Println("Cloud cover", getCloudCover(data.DataSeries[0].CloudCover))
+	fmt.Println("Cloud Cover:", data.DataSeries[0].CloudCoverString())
+	// fmt.Println("Lifted Index", getLiftedIndex(data.DataSeries[0].LiftedIndex))
+	fmt.Println("Lifted Index", data.DataSeries[0].LiftedIndexString())
+	// fmt.Println("Temperature 2 meters", data.DataSeries[0].Temp2m, "°C")
+	fmt.Println("Temperature 2 meters", data.DataSeries[0].TemperatureString())
+	// fmt.Println("Seeing range", getSeeing(data.DataSeries[0].Seeing))
+	fmt.Println("Seeing range:", data.DataSeries[0].SeeingString())
+	// fmt.Println("Transparency range", getTransparency(data.DataSeries[0].Transparency))
+	fmt.Println("Transparency range:", data.DataSeries[0].TransparencyString())
+	// fmt.Println("Relative humidity 2 meters", getRelativeHumidity(data.DataSeries[0].RH2m))
+	fmt.Println("Relative humidity 2 meters", data.DataSeries[0].HumidityString())
 	fmt.Println("Precipitation type", data.DataSeries[0].PrecType)
-	fmt.Println("Wind", data.DataSeries[0].Wind10m.Direction, getWindSpeed(data.DataSeries[0].Wind10m.Speed))
+	fmt.Println("Wind", data.DataSeries[0].WindSpeedString())
 
 }
 
@@ -295,7 +270,8 @@ func printWeatherDataToCSV(data *ApiResponse, lat string, lng string) {
 
 	// write forecast series to file
 	for i := 0; i < len(data.DataSeries); i++ {
-		rowData := []string{strconv.Itoa(data.DataSeries[i].Timepoint), getCloudCover(data.DataSeries[i].CloudCover)}
+		// rowData := []string{strconv.Itoa(data.DataSeries[i].Timepoint), getCloudCover(data.DataSeries[i].CloudCover)}
+		rowData := []string{strconv.Itoa(data.DataSeries[i].Timepoint), data.DataSeries[i].CloudCoverString(), data.DataSeries[i].LiftedIndexString(), data.DataSeries[i].TemperatureString(), data.DataSeries[i].SeeingString(), data.DataSeries[i].TransparencyString(), data.DataSeries[i].HumidityString(), data.DataSeries[i].PrecType, data.DataSeries[i].WindSpeedString()}
 		writer.Write(rowData)
 	}
 
